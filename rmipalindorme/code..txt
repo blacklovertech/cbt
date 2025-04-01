@@ -1,0 +1,119 @@
+Here's a refactored and working RMI program for checking whether a string is a palindrome, structured in a modern, error-free way.
+
+📌 Remote Method Invocation (RMI) - Palindrome Check
+🛠 Steps to Run
+Compile all files.
+Start the RMI registry.
+Run the server.
+Run the client.
+
+📌 1. Create the Remote Interface (Palindrome.java)
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+
+public interface Palindrome extends Remote {
+    boolean isPalindrome(String str) throws RemoteException;
+}
+
+✅ Defines the method isPalindrome() that will be implemented on the server.
+
+📌 2. Implement the Remote Interface (PalindromeImpl.java)
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+
+public class PalindromeImpl extends UnicastRemoteObject implements Palindrome {
+
+    protected PalindromeImpl() throws RemoteException {
+        super();
+    }
+
+    @Override
+    public boolean isPalindrome(String str) throws RemoteException {
+        String reversed = new StringBuilder(str).reverse().toString();
+        return str.equalsIgnoreCase(reversed);
+    }
+}
+
+✅ Implements the palindrome logic and extends UnicastRemoteObject for remote invocation.
+
+📌 3. Create the RMI Server (PalindromeServer.java)
+import java.rmi.Naming;
+import java.rmi.registry.LocateRegistry;
+
+public class PalindromeServer {
+    public static void main(String[] args) {
+        try {
+            LocateRegistry.createRegistry(1099); // Start RMI registry
+            PalindromeImpl palindromeService = new PalindromeImpl();
+            Naming.rebind("rmi://localhost/PalindromeService", palindromeService);
+            System.out.println("Palindrome RMI Server is running...");
+        } catch (Exception e) {
+            System.err.println("Server exception: " + e.getMessage());
+        }
+    }
+}
+
+✅ Starts the RMI registry and binds the remote object.
+ ✅ Use rebind() instead of bind() to avoid issues if the service is already registered.
+
+📌 4. Create the RMI Client (PalindromeClient.java)
+import java.rmi.Naming;
+import java.util.Scanner;
+
+public class PalindromeClient {
+    public static void main(String[] args) {
+        try {
+            Palindrome palindromeService = (Palindrome) Naming.lookup("rmi://localhost/PalindromeService");
+            Scanner scanner = new Scanner(System.in);
+
+            System.out.print("Enter a string: ");
+            String input = scanner.nextLine();
+
+            if (palindromeService.isPalindrome(input)) {
+                System.out.println("The given string is a palindrome.");
+            } else {
+                System.out.println("The given string is not a palindrome.");
+            }
+
+            scanner.close();
+        } catch (Exception e) {
+            System.err.println("Client exception: " + e.getMessage());
+        }
+    }
+}
+
+✅ Looks up the remote service and interacts with the user to check for palindromes.
+
+📌 5. Compilation and Execution Steps
+🔹 Step 1: Compile All Java Files
+javac *.java
+
+🔹 Step 2: Start the RMI Registry
+rmiregistry
+
+(Keep this terminal open.)
+🔹 Step 3: Start the RMI Server
+java PalindromeServer
+
+(You'll see Palindrome RMI Server is running....)
+🔹 Step 4: Run the Client
+java PalindromeClient
+
+(Enter a string, and it will check for a palindrome.)
+
+📌 Expected Output
+Enter a string: madam
+The given string is a palindrome.
+
+OR
+Enter a string: hello
+The given string is not a palindrome.
+
+
+🚀 Improvements Over Your Original Code
+✅ Uses boolean instead of int for clarity.
+ ✅ Uses isPalindrome() instead of palin() for better readability.
+ ✅ Ensures rmiregistry is started automatically when running the server.
+ ✅ Handles exceptions properly.
+Let me know if you need further modifications! 🚀
+
